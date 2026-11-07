@@ -17,6 +17,10 @@ Tudo roda em **um único container** (site + API + banco SQLite). Os dados ficam
 
 ---
 
+> **Publicar na AWS (EC2) com atualização automática pelo GitHub?** Siga o guia [PUBLICAR-NA-AWS.md](PUBLICAR-NA-AWS.md).
+
+---
+
 ## 1. Pré-requisitos
 
 - **Docker Desktop** (Windows/Mac) ou Docker Engine + plugin compose (Linux).
@@ -96,6 +100,9 @@ docker cp conecta-escola:/data/backups ./backups
 docker compose stop app
 docker cp ./backups/ARQUIVO.db conecta-escola:/data/conecta-escola.db
 docker compose start app
+
+# Esqueci a senha do admin
+docker compose exec app node --disable-warning=ExperimentalWarning dist/reset-admin.js NOVA_SENHA
 
 # APAGAR TUDO (fim do projeto, LGPD): remove container e volume com os dados
 docker compose down -v

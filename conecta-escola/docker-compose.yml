@@ -4,12 +4,14 @@ services:
     image: conecta-escola:latest
     container_name: conecta-escola
     restart: unless-stopped
+    init: true   # repassa o sinal de parada ao Node (down/restart instantâneo)
     env_file:
       - path: .env
         required: false
     environment:
       PORT: 3000
       DATA_DIR: /data
+      APP_PORT: ${APP_PORT:-8080}   # só para mostrar o endereço certo no log
     ports:
       - "${APP_PORT:-8080}:3000"
     volumes:

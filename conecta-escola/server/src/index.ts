@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import path from "node:path";
 import fs from "node:fs";
-import { seed } from "./db.js";
+import { db, seed } from "./db.js";
 import { loadUser } from "./auth.js";
 import { api } from "./api.js";
 import { admin } from "./admin.js";
@@ -45,4 +45,19 @@ if (fs.existsSync(WEB_DIR)) {
 }
 
 const PORT = Number(process.env.PORT || 3000);
-app.listen(PORT, "0.0.0.0", () => console.log(`[conecta-escola] rodando em http://0.0.0.0:${PORT}`));
+// Dentro do container a porta é sempre 3000; quem acessa usa a porta publicada (APP_PORT, padrão 8080).
+const HOST_PORT = process.env.APP_PORT || PORT;
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`[conecta-escola] site no ar!`);
+  console.log(`[conecta-escola] neste computador: http://localhost:${HOST_PORT}`);
+  console.log(`[conecta-escola] no celular (mesmo Wi-Fi): http://IP-DO-NOTEBOOK:${HOST_PORT}  (QR code em /qr)`);
+});
+
+// Desliga rápido e sem corromper o banco quando o Docker pede para parar.
+for (const sig of ["SIGTERM", "SIGINT"] as const) {
+  process.on(sig, () => {
+    server.close();
+    db.close();
+    process.exit(0);
+  });
+}
