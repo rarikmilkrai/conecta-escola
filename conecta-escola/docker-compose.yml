@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    image: conecta-escola:latest
+    container_name: conecta-escola
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PORT: 3000
+      DATA_DIR: /data
+    ports:
+      - "${APP_PORT:-8080}:3000"
+    volumes:
+      - dados:/data
+
+  # Plano B para o dia: URL pública HTTPS via Cloudflare Tunnel, funciona em qualquer rede.
+  # Liga com:  docker compose --profile tunnel up -d   e veja a URL com: docker compose logs tunnel
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://app:3000
+    depends_on:
+      - app
+
+volumes:
+  dados:
